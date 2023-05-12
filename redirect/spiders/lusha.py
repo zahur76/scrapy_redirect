@@ -19,7 +19,7 @@ company_list = []
 
 company_details = []
 
-links = ['https://www.lusha.com/company-search/hospital-health-care/27/']
+links = ['https://www.lusha.com/company-search/marketing-and-advertising/6/']
 
 
 class QuotesSpider(scrapy.Spider):
@@ -65,7 +65,7 @@ class QuotesSpider(scrapy.Spider):
     def parse_three(self, response):
 
         try:
-            firm = response.css('h1.company-nav-title::text').extract_first()
+            firm = response.css('h1.company-nav-title::text').extract()
 
             print(firm)
 

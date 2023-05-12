@@ -12,12 +12,23 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 mydb = myclient["hotfrog"]
 
-mycol = mydb["hotfrog_parent_C"]
+mycol = mydb["hotfrog_southern_B"]
 
 
 company_list = []
 
 company_details = []
+
+
+urls = [
+    'https://www.hotfrog.co.uk/search/somerset',
+'https://www.hotfrog.co.uk/search/bedfordshire',
+'https://www.hotfrog.co.uk/search/cambridgeshire,'
+'https://www.hotfrog.co.uk/search/essex',
+'https://www.hotfrog.co.uk/search/hertfordshire',
+'https://www.hotfrog.co.uk/search/norfolk',
+'https://www.hotfrog.co.uk/search/suffolk'
+]
 
 
 class QuotesSpider(scrapy.Spider):
@@ -33,8 +44,9 @@ class QuotesSpider(scrapy.Spider):
     
     
     def start_requests(self):
-        for i in range(1, 201):      
-            yield scrapy.Request(url=f'https://www.hotfrog.co.uk/search/gb/child-safety/{i}', callback=self.parse_two)
+        for url in urls:
+            for i in range(1, 844):     
+                yield scrapy.Request(url=f'{url}/_/{i}', callback=self.parse_two)
 
 
 
@@ -65,7 +77,7 @@ class QuotesSpider(scrapy.Spider):
             postcode = response.css('span[data-address-postcode]::text').extract_first()
 
             details = {'Source': 'https://www.hotfrog.co.uk/', 'Firm': firm, 'URL': url, 'Telephone Number': phone,
-                        'State Or County': state, 'City': city, 'Postal Code': postcode, 'Business Sector 1': 'Child Safety'}
+                        'State Or County': state, 'City': city, 'Postal Code': postcode}
 
             print(details)
             company_details.append(details) 
@@ -76,8 +88,3 @@ class QuotesSpider(scrapy.Spider):
 
         except Exception as e:
             print(f'{e}')
-
-# https://www.hotfrog.com/search/us/maternity
-# https://www.hotfrog.com/search/us/nursery-furniture
-# https://www.hotfrog.com/search/us/childbirth
-# https://www.hotfrog.com/search/us/child-safety

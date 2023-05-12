@@ -21,6 +21,11 @@ mycol = mydb["cataloxy"]
 class QuotesSpider(scrapy.Spider):
     name = "cataloxy"
 
+    custom_settings = {
+        'DOWNLOAD_DELAY': 2,
+        'CONCURRENT_REQUESTS': 1
+    }
+
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(QuotesSpider, cls).from_crawler(crawler, *args, **kwargs)

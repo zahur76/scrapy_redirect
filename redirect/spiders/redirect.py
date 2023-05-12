@@ -25,7 +25,7 @@ class QuotesSpider(scrapy.Spider):
             redirect_list.append(values)
         json_data = json.dumps(redirect_list, ensure_ascii=False)
         json_data = json_data.replace('\\"', "")
-        with open(f"output/manifest.json", "w", encoding="utf-8") as out:
+        with open(f"output/travelalberta.json", "w", encoding="utf-8") as out:
             out.write(json_data)
 
     def start_requests(self):
