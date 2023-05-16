@@ -13,7 +13,7 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 mydb = myclient["spoke"]
 
-mycol = mydb["Mining"]
+mycol = mydb["spoke_golbal_Sealant"]
 
 
 def find_between( s, first, last ):
@@ -38,9 +38,9 @@ class QuotesSpider(scrapy.Spider):
         print('end')
     
     def start_requests(self):
-        for i in range(1, 2):
+        for i in range(1, 154):
             print(f'page: {i}')
-            yield scrapy.Request(url=f'https://www.spoke.com/search?page={i}&q=irrigation&type=company&utf8=%E2%9C%93', callback=self.parse_two)
+            yield scrapy.Request(url=f'https://www.spoke.com/search?page={i}&q=equine&type=company&utf8=%E2%9C%93', callback=self.parse_two)
             
     def parse_two(self, response):
 
@@ -73,10 +73,10 @@ class QuotesSpider(scrapy.Spider):
 
 
             details = {'Source': 'https://www.spoke.com/', 'Firm': firm, 'URL': url, 'Email Address': email,
-                        'Address Line 1': address, 'City': city, 'State Or County': state, 'Business Sector 1': 'Irrigation'}
+                        'Address Line 1': address, 'City': city, 'State Or County': state, 'Business Sector 1': 'Equine'}
 
             print(details)
-            # mycol.insert_one(details)
+            mycol.insert_one(details)
 
         except Exception as e:
             print(f'{e}')

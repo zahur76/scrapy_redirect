@@ -2,10 +2,7 @@ import scrapy
 from scrapy import signals
 from scrapy.selector import Selector
 
-import pandas as pd
-import csv
-import json
-import os
+from scrapy.http import FormRequest
 
 company_list = []
 
@@ -21,6 +18,7 @@ def find_between( s, first, last ):
         return ""
 
 
+
 class QuotesSpider(scrapy.Spider):
     name = "aihitdata"
 
@@ -32,33 +30,36 @@ class QuotesSpider(scrapy.Spider):
 
     def spider_closed(self, spider):
         print('end')
-        json_data = json.dumps(company_details, ensure_ascii=False)
-        json_data = json_data.replace('\\"', "")
-        with open(f"output/aihitdata.json", "w", encoding="utf-8") as out:
-            out.write(json_data)
-    
+
+
     def start_requests(self):
+        login_url = 'https://www.aihitdata.com/login'
+        yield scrapy.FormRequest(login_url,
+                            formdata={'csrf_token': 'IjgwODI5ZGQxYjRmMmZlOTg1Y2M3N2YwMjA2NGQ2NWM5MDNjYzBkYWYi.F0Ps5g.OlRsWZDlJpLDl5U22rYpkyP79n0','email': 'biweg62408@glumark.com', 'password': 'ben_zima*1976'},
+                            callback=self.start_scraping)
+        
+    
+    def start_scraping(self, response):
+        print(response)
         for i in range(1, 101):
             print(f'page: {i}')
-            yield scrapy.Request(url=f'https://www.aihitdata.com/search/companies?c=&i=life+sciences&k=&v=3&l=&p={i}&r=&t=&w=1&rc=', callback=self.parse_two)
+            yield scrapy.Request(url=f'https://www.aihitdata.com/search/companies?c=&e=1&i=hospitality+consulting&k=&v=3&l=&p={i}&r=&t=&w=1&rc=', callback=self.parse_two)
         
     def parse_two(self, response):
 
-        links = response.css('div.panel-body > div > a::attr("href")').extract()
 
-        print(len(links))
+        links = response.css('div.panel-body > div > a::attr("href")').extract()
 
         for link in links:
             yield scrapy.Request(url=response.urljoin(link), callback=self.parse_three, dont_filter=True)
 
         
     def parse_three(self, response):
-        print(response.url)
-
+        print(response.page)
         try:
             firm = response.css('h1.text-info::text').extract_first().strip()
             print(firm)
-            url = response.css('ul.list-inline > li a.::attr("href")').extract_first()
+            url = response.css('i.icon-sm.icon-home + a::attr("href")').extract_first()
             print(url)
 
             # linkedin = response.css('p.url-linkedin a::attr("href")').extract_first()
@@ -89,3 +90,5 @@ class QuotesSpider(scrapy.Spider):
 
         except Exception as e:
             print(f'{e}')
+
+

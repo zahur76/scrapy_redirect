@@ -12,7 +12,7 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 mydb = myclient["glassdoor"]
 
-mycol = mydb["glassdoor"]
+mycol = mydb["glassdoor_B"]
 
 
 
@@ -29,8 +29,8 @@ class QuotesSpider(scrapy.Spider):
     
     def start_requests(self):
         # 201
-        for i in range(1, 111):
-            yield scrapy.Request(url=f'https://www.glassdoor.com/Explore/browse-companies.htm?overall_rating_low=3.5&page={i}&locId=567&locType=M&locName=Minneapolis-St.%20Paul,%20MN&sector=10015&filterType=RATING_OVERALL', callback=self.parse_two)
+        for i in range(1, 216):
+            yield scrapy.Request(url=f'https://www.glassdoor.co.uk/Explore/browse-companies.htm?overall_rating_low=3.5&page={i}&industry=200028&filterType=RATING_OVERALL', callback=self.parse_two)
 
     
     def parse_two(self, response):

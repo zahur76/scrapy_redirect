@@ -13,7 +13,7 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 mydb = myclient["europages"]
 
-mycol = mydb["europages_research"]
+mycol = mydb["europages_management"]
 
 
 company_list = []
@@ -45,9 +45,9 @@ class QuotesSpider(scrapy.Spider):
 
 
     def start_requests(self):
-        for i in range(1, 11):
+        for i in range(309, 393):
             print(f'page: {i}')
-            yield scrapy.Request(url=f'https://www.europages.co.uk/companies/cat-1-testing%20of%20products%20and%20materials%20-%20institutions/pg-{i}/product%20testing.html', callback=self.parse_two)
+            yield scrapy.Request(url=f'https://www.europages.co.uk/companies/cat-1-management%20advice/pg-{i}/consultancy.html', callback=self.parse_two)
 
 
     def parse_one(self, response):
@@ -101,7 +101,7 @@ class QuotesSpider(scrapy.Spider):
         
 
         details = {'Source': 'https://www.europages.co.uk', 'Firm': firm.strip(), 'URL': url, 'Address Line 1': ' '.join(address).strip(),
-                   'Business Sector 1': 'Product testing'}
+                   'Business Sector 1': 'Management Consultancy'}
 
         print(details)
 
