@@ -11,9 +11,9 @@ import pymongo
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
-mydb = myclient["itrate"]
+mydb = myclient["topdevelopers"]
 
-mycol = mydb["itrate_web_developers"]
+mycol = mydb["topdevelopers"]
 
 
 def find_between( s, first, last ):
@@ -26,7 +26,7 @@ def find_between( s, first, last ):
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "itrate"
+    name = "topdevelopers"
 
     custom_settings = {
         'DOWNLOAD_DELAY': 2,
@@ -43,27 +43,27 @@ class QuotesSpider(scrapy.Spider):
         print('end')
     
     def start_requests(self):
-        for i in range(1, 95):
+        for i in range(1, 107):
             print(f'page: {i}')
-            yield scrapy.Request(url=f'https://itrate.co/web-developers/all/us?page={i}', callback=self.parse_two)
+            yield scrapy.Request(url=f'https://www.topdevelopers.co/directory/software-development-companies?page={i}', callback=self.parse_two)
             
     def parse_two(self, response):
-
-        elements = response.css('div.catalogcards__item').extract()
-
+        print(response.url)
+        elements = response.css("div[itemprop='itemListElement']").extract()
+      
         for element in elements:
             try:
                
-                firm = Selector(text=element).css("h3::text").extract_first().strip()
+                firm = Selector(text=element).css("span[itemprop='name']::text").extract_first().strip()
                 
               
-                url = Selector(text=element).css("a.preview__btn::attr('href')").extract_first()
+                url = Selector(text=element).css("a.visit_site::attr('href')").extract_first()
 
 
-                address = Selector(text=element).css("div:nth-of-type(n+3) li:nth-of-type(4) p::text").extract_first()
+                address = Selector(text=element).css("div.set_country p::text").extract_first()
                 
 
-                details = {'Source': 'https://itrate.co/', 'Firm': firm, 'URL': url, 'Address Line 1': address, 'Business Sector 1': 'Web Developers'}
+                details = {'Source': 'https://www.topdevelopers.co/', 'Firm': firm, 'URL': url, 'Address Line 1': address, 'Business Sector 1': 'Python Developer'}
 
 
                 print(details)

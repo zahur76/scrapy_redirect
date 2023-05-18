@@ -11,9 +11,9 @@ import pymongo
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
-mydb = myclient["itrate"]
+mydb = myclient["visualobj"]
 
-mycol = mydb["itrate_web_developers"]
+mycol = mydb["visualobj"]
 
 
 def find_between( s, first, last ):
@@ -26,12 +26,12 @@ def find_between( s, first, last ):
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "itrate"
+    name = "visualobj"
 
-    custom_settings = {
-        'DOWNLOAD_DELAY': 2,
-        'CONCURRENT_REQUESTS': 1
-    }
+    # custom_settings = {
+    #     'DOWNLOAD_DELAY': 2,
+    #     'CONCURRENT_REQUESTS': 1
+    # }
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -43,31 +43,30 @@ class QuotesSpider(scrapy.Spider):
         print('end')
     
     def start_requests(self):
-        for i in range(1, 95):
+        for i in range(1, 122):
             print(f'page: {i}')
-            yield scrapy.Request(url=f'https://itrate.co/web-developers/all/us?page={i}', callback=self.parse_two)
+            yield scrapy.Request(url=f'https://visualobjects.com/app-development/industry/financial-services?page={i}', callback=self.parse_two)
             
     def parse_two(self, response):
 
-        elements = response.css('div.catalogcards__item').extract()
+        elements = response.css('.company-titles').extract()
+
 
         for element in elements:
             try:
                
-                firm = Selector(text=element).css("h3::text").extract_first().strip()
+                firm = Selector(text=element).css("span::text").extract_first()
                 
               
-                url = Selector(text=element).css("a.preview__btn::attr('href')").extract_first()
-
-
-                address = Selector(text=element).css("div:nth-of-type(n+3) li:nth-of-type(4) p::text").extract_first()
+                url = Selector(text=element).css("div.visit-website-btn a::attr('href')").extract_first()
                 
 
-                details = {'Source': 'https://itrate.co/', 'Firm': firm, 'URL': url, 'Address Line 1': address, 'Business Sector 1': 'Web Developers'}
+                details = {'Source': 'https://visualobjects.com/', 'Firm': firm, 'URL': url}
 
 
                 print(details)
                 mycol.insert_one(details)
+
 
         
             except Exception as e:

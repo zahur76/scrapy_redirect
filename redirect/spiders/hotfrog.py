@@ -12,20 +12,11 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 mydb = myclient["hotfrog"]
 
-mycol = mydb["hotfrog_parent_A"]
-
-
-company_list = []
-
-company_details = []
-
-links = [
-    'https://www.hotfrog.com/search/us/baby-stores'
-]
+mycol = mydb["hotfrog_global_B"]
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "hotfrog"
+    name = "frog_v2"
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(QuotesSpider, cls).from_crawler(crawler, *args, **kwargs)
@@ -37,8 +28,11 @@ class QuotesSpider(scrapy.Spider):
     
     
     def start_requests(self):
-        for link in links:      
-            yield scrapy.Request(url=link, callback=self.parse_two)
+       
+        for i in range(1, 844):     
+            yield scrapy.Request(url=f'https://www.hotfrog.co.uk/search/gb/pest-control/{i}', callback=self.parse_two)
+
+
 
     def parse_two(self, response):
         print(response.url)
@@ -46,33 +40,40 @@ class QuotesSpider(scrapy.Spider):
         for link in links:          
             yield scrapy.Request(url=response.urljoin(link), callback=self.parse_three, meta={'page': response.url})
 
-       
-        next = response.css('a:contains("Volgende bladzijde")::attr("href")').extract_first()
-
-        next_page = int(next.split('/')[-1])
-        if next and next_page <=20:
-            yield scrapy.Request(url=response.urljoin(next), callback=self.parse_two)
 
     def parse_three(self, response):
 
         # print(response.url) 
         try:
-            firm = response.css('h1.business-name--verified::text').extract_first()
+            firm = response.css('strong.lead::text').extract_first()
 
-            phone = response.css('dt:contains("Telefoon") + dd::text').extract_first()
+            phone = response.css('dt:contains("Phone") + dd::text').extract_first()
 
             if phone:
                 phone = phone.strip()
 
             url = response.css('dt:contains("Website") + .col-8 a::attr("href")').extract_first()
 
-            address = response.css('dt:contains("Adres") + dd span').extract_first()
+            state = response.css('span[data-address-county]::text').extract_first()
 
-            details = {'Source': 'https://www.hotfrog.com/', 'Firm': firm, 'URL': url, 'Telephone Number': phone,
-                        'Address Line 1': address, 'Business Sector': 'Baby Stores'}
+            city = response.css('span[data-address-town]::text').extract_first()
+
+            postcode = response.css('span[data-address-postcode]::text').extract_first()
+
+            details = {'Source': 'https://www.hotfrog.co.uk/', 'Firm': firm, 'URL': url, 'Telephone Number': phone,
+                        'State Or County': state, 'City': city, 'Postal Code': postcode, 'Business Sector 1': 'Pest Control'}
 
             print(details)
-            
+   
+
+            mycol.insert_one(details)          
+
+
 
         except Exception as e:
             print(f'{e}')
+
+
+# https://www.hotfrog.co.uk/search/gb/batteries-%26-power-supply
+# https://www.hotfrog.co.uk/search/gb/design-%26-printing
+# https://www.hotfrog.co.uk/search/gb/telephone-equipment
